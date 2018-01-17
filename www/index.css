@@ -1,0 +1,10 @@
+body {
+  background: grey;
+}
+
+#p5canvas_wrapper {
+  width: 90%;
+  margin: auto;
+  padding: 16px;
+  z-index: -1;
+}
