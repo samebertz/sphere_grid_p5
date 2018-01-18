@@ -1,8 +1,7 @@
 define(['p5'],
 function(p5) {
-  var instance = new p5()
   function v3d_magnitude (a) {
-    return p5.prototype.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
+    return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
   }
   function v3d_scale (a, s) {
     return [s*a[0], s*a[1], s*a[2]]
@@ -30,15 +29,15 @@ function(p5) {
   // coordinate conversion using trig functions from p5.js Math
   function v3d_cartesian_to_spherical (a) {
     var r = v3d_magnitude(a)
-    var theta = p5.prototype.atan2(a[1], a[0])
-    var phi = p5.prototype.acos(a[2] / r)
+    var theta = Math.atan2(a[1], a[0])
+    var phi = Math.acos(a[2] / r)
     return [r, theta, phi]
   }
 
   function v3d_spherical_to_cartesian (a) {
-    var x = a[0] * p5.prototype.sin(a[1]) * p5.prototype.sin(a[2])
-    var y = a[0] * p5.prototype.sin(a[1]) * p5.prototype.cos(a[2])
-    var z = a[0] * p5.prototype.cos(a[1])
+    var x = a[0] * Math.sin(a[1]) * Math.sin(a[2])
+    var y = a[0] * Math.sin(a[1]) * Math.cos(a[2])
+    var z = a[0] * Math.cos(a[1])
     return [x, y, z]
   }
 
