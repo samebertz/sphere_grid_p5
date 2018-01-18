@@ -33,3 +33,24 @@ function icosahedron() {
     }
   }
 }
+
+function bisect(face) {
+  var v1 = face[0]
+  var v2 = face[1]
+  var v3 = face[2]
+  var v1_v2_midpoint = v3d_scl(v3d_add(v1, v2), 0.5)
+  var v2_v3_midpoint = v3d_scl(v3d_add(v2, v3), 0.5)
+  var v3_v1_midpoint = v3d_scl(v3d_add(v3, v1), 0.5)
+  var f1_ = [v1, v1_v2_midpoint, v3_v1_midpoint]
+  var f2_ = [v2, v2_v3_midpoint, v1_v2_midpoint]
+  var f3_ = [v3, v3_v1_midpoint, v2_v3_midpoint]
+  var f4_ = [v1_v2_midpoint, v2_v3_midpoint, v3_v1_midpoint]
+  return [f1_, f2_, f3_, f4_]
+}
+function project(points, r) {
+  var projection = []
+  for (point of points) {
+    projection.push(v3d_scl(v3d_nrm(point), r))
+  }
+  return projection
+}
