@@ -3,7 +3,7 @@ requirejs.config({
   paths: {
     lib: 'lib',
     p5: 'lib/p5/p5',
-    v3d: 'lib/V3D'
+    v3d: 'lib/V3D',
     utils: 'lib/utils'
   }
 })
