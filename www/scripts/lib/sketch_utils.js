@@ -11,7 +11,6 @@ function(v3d,   p5) {
     },
     // draw axes where +x, +y, and +z are red, green and blue respectively
     drawAxes: function (scale) {
-      this.strokeWeight(.1)
       this.stroke(255, 0, 0)
       this.beginShape(this.LINES)
       this.vertex(0, 0, 0)

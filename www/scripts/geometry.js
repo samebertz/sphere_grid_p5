@@ -1,3 +1,5 @@
+// TODO: refactor so primitive generation is separate
+
 define(['p5', 'v3d'],
 function(p5,   v3d) {
   function icosahedron() {
@@ -27,13 +29,13 @@ function(p5,   v3d) {
     }
 
     function draw() {
+      this.beginShape(this.TRIANGLES)
       for (face of faces) {
-        this.beginShape(this.LINES)
         this.vertex(...face[0])
         this.vertex(...face[1])
         this.vertex(...face[2])
-        this.endShape(this.CLOSE)
       }
+      this.endShape()
     }
 
     function subdivide(face) {
@@ -68,6 +70,23 @@ function(p5,   v3d) {
       // console.log(subdivisions)
       faces = subdivisions
     }
+
+    function circumcenter(triangle) {
+      var a = v3d.sub(triangle[0], triangle[2]),
+          b = v3d.sub(triangle[1], triangle[2]),
+          c = v3d.sub(triangle[0], triangle[1]),
+          n = 2*v3d.msq(v3d.crs(c, b))
+      var alpha = v3d.msq(b) * v3d.dot(c, a) / n,
+          beta  = v3d.msq(a) * v3d.dot(v3d.scl(c,-1), b) / n,
+          gamma = v3d.msq(c) * v3d.dot(v3d.scl(a,-1), v3d.scl(b,-1)) / n
+      return v3d.add(v3d.add(
+        v3d.scl(triangle[1], beta),
+        v3d.scl(triangle[2], gamma)),
+        v3d.scl(triangle[0], alpha)
+      )
+    }
+
+    // console.log(circumcenter([[1,4,5],[3,1,4],[4,5,3]]))
 
     return {
       primitive: {

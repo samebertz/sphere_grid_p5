@@ -1,5 +1,8 @@
 define(['p5'],
 function(p5) {
+  function v3d_magnitude_squared (a) {
+    return a[0]*a[0] + a[1]*a[1] + a[2]*a[2]
+  }
   function v3d_magnitude (a) {
     return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
   }
@@ -46,6 +49,7 @@ function(p5) {
   }
 
   return {
+    msq:        v3d_magnitude_squared,
     mag:        v3d_magnitude,
     scl:        v3d_scale,
     nrm:        v3d_normalize,
