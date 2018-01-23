@@ -16,16 +16,40 @@ function(p5,   v3d) {
     vertices.push([0, 0, -1])
     // console.log(vertices)
 
+    var vertex_neighbors = []
+    for (i=0;i<vertices.length;i++) {
+      vertex_neighbors.push([])
+    }
+    console.log(vertex_neighbors)
+
     var faces = []
     for (let i = 0; i < 5; i++) {
       faces.push([vertices[0], vertices[1+i], vertices[1+(i+1)%5]])
+      vertex_neighbors[0].push(4*i)
+      vertex_neighbors[1+i].push(4*i)
+      vertex_neighbors[1+(i+1)%5].push(4*i)
       faces.push([vertices[1+i], vertices[6+i], vertices[1+(i+1)%5]])
+      vertex_neighbors[1+i].push(4*i+1)
+      vertex_neighbors[6+i].push(4*i+1)
+      vertex_neighbors[1+(i+1)%5].push(4*i+1)
       faces.push([vertices[1+i], vertices[6+(i+4)%5], vertices[6+i]])
+      vertex_neighbors[1+i].push(4*i+2)
+      vertex_neighbors[6+(i+4)%5].push(4*i+2)
+      vertex_neighbors[6+i].push(4*i+2)
       faces.push([vertices[6+i], vertices[6+(i+1)%5], vertices[11]])
+      vertex_neighbors[6+i].push(4*i+3)
+      vertex_neighbors[6+(i+1)%5].push(4*i+3)
+      vertex_neighbors[11].push(4*i+3)
       // faces.push([ 0,    1+i,        1+(i+1)%5 ])
       // faces.push([ 1+i,  6+i,        1+(i+1)%5 ])
       // faces.push([ 1+i,  6+(i+4)%5,  6+i       ])
       // faces.push([ 6+i,  6+(i+1)%5,  11        ])
+    }
+    console.log(vertex_neighbors)
+    for (neighbor of vertex_neighbors) {
+      neighbor.sort(function(a,b) {
+        return a-b
+      })
     }
 
     function draw() {
@@ -36,6 +60,17 @@ function(p5,   v3d) {
         this.vertex(...face[2])
       }
       this.endShape()
+    }
+
+    function draw_poly() {
+      for (face of dual) {
+        console.log(face)
+        this.beginShape(this.TRIANGLE_FAN)
+        for(vertex of face) {
+          this.vertex(...vertex)
+        }
+        this.endShape(this.CLOSE)
+      }
     }
 
     function subdivide(face) {
@@ -86,6 +121,22 @@ function(p5,   v3d) {
       )
     }
 
+    var dual = []
+    function compute_VT_dual() {
+      var circumcenters = []
+      for (face of faces) {
+        circumcenters.push(circumcenter(face))
+      }
+      for(let i=0; i<vertices.length; i++) {
+        dual.push([])
+        for (neighbor of vertex_neighbors[i]) {
+          dual[i].push(circumcenters[neighbor])
+        }
+      }
+      // console.log(dual)
+      // return dual
+    }
+
     // console.log(circumcenter([[1,4,5],[3,1,4],[4,5,3]]))
 
     return {
@@ -94,7 +145,9 @@ function(p5,   v3d) {
         faces: faces
       },
       draw: draw,
-      subdivide_and_project: subdivide_and_project
+      draw_poly: draw_poly,
+      subdivide_and_project: subdivide_and_project,
+      compute_VT_dual: compute_VT_dual
     }
   }
   return icosahedron()
