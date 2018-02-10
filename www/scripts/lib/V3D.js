@@ -48,6 +48,16 @@ function(p5) {
     return [a[0], a[1], a[2] + angle]
   }
 
+  // helpful utils
+  function v3d_separation_angle (a, b) {
+    // console.log('computing angle of separation between <'+a.join(',')+'> and <'+b.join(',')+'>')
+    if(a == b) {
+      // console.log('vectors were identical')
+      return 0
+    }
+    return Math.acos(v3d_dot_product(a, b)) // note: assumes normalized inputs
+  }
+
   return {
     msq:        v3d_magnitude_squared,
     mag:        v3d_magnitude,
@@ -59,6 +69,7 @@ function(p5) {
     crs:        v3d_cross_product,
     crt_to_sph: v3d_cartesian_to_spherical,
     sph_to_crt: v3d_spherical_to_cartesian,
-    sph_rot_z:  v3d_spherical_rotate_z
+    sph_rot_z:  v3d_spherical_rotate_z,
+    sep_angle:  v3d_separation_angle
   }
 })

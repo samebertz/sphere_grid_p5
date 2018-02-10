@@ -31,7 +31,7 @@ function   (p5,   v3d,   geometry,   sketch_utils) {
       // icosahedron.subdivide_and_project()
       icosahedron.draw = icosahedron.draw.bind(sketch)
       icosahedron.compute_VT_dual()
-      icosahedron.draw_poly = icosahedron.draw_poly.bind(sketch)
+      icosahedron.draw_dual = icosahedron.draw_dual.bind(sketch)
 
       sketch.setFrameRate(30)
       // sketch.noLoop()
@@ -39,17 +39,17 @@ function   (p5,   v3d,   geometry,   sketch_utils) {
 
     sketch.draw = function() {
       sketch.background(72)
-      sketch.orbitControl()
+      // sketch.orbitControl()
       sketch.rotateZ(sketch.millis()/2000)
       sketch.utils.drawAxes(1.5)
 
       // sketch.noStroke()
       sketch.stroke(255)
       sketch.noFill()
-      icosahedron.draw()
+      // icosahedron.draw()
       sketch.stroke(200,100,100)
       sketch.fill(72)
-      icosahedron.draw_poly()
+      icosahedron.draw_dual()
 
       // sketch.noStroke()
       sketch.stroke(200,100,200)

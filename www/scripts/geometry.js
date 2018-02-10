@@ -45,7 +45,7 @@ function(p5,   v3d) {
       // faces.push([ 1+i,  6+(i+4)%5,  6+i       ])
       // faces.push([ 6+i,  6+(i+1)%5,  11        ])
     }
-    console.log(vertex_neighbors)
+    // console.log(vertex_neighbors)
     for (neighbor of vertex_neighbors) {
       neighbor.sort(function(a,b) {
         return a-b
@@ -62,14 +62,19 @@ function(p5,   v3d) {
       this.endShape()
     }
 
-    function draw_poly() {
+    function draw_dual() {
+      var i
+      var step = 255.0/4.0
       for (face of dual) {
-        console.log(face)
+        i=0
+        // console.log(face)
         this.beginShape(this.TRIANGLE_FAN)
         for(vertex of face) {
+          this.fill(i*step,i*step,100)
+          i++
           this.vertex(...vertex)
         }
-        this.endShape(this.CLOSE)
+        this.endShape()
       }
     }
 
@@ -121,17 +126,91 @@ function(p5,   v3d) {
       )
     }
 
+    function order_vertices(vertex_array) {
+      // compute centroid
+      var c = v3d.scl(vertex_array.reduce(function(accumulator, current) {
+        return v3d.add(accumulator, current)
+      }, [0,0,0]), 1.0/vertex_array.length)
+
+      // compute vector from centroid to each vertex and normalize
+      var spokes = vertex_array.map(function(vertex) {
+        return [v3d.nrm(v3d.sub(vertex,c)), vertex]
+      })
+      // console.log(spokes)
+
+      // select a reference spoke
+      var ref = spokes[0][0]
+      // console.log(ref)
+      // compute the surface normal
+      var normal = v3d.nrm(v3d.crs(spokes[0][0], spokes[1][0]))
+
+      // for (spoke of spokes) {
+      //   let spoke_angle = v3d.sep_angle(ref, spoke[0])
+      //   let cross = v3d.crs(ref, spoke[0])
+      //   if(v3d.dot(normal, cross) < 0) {
+      //     spoke_angle = 2*Math.PI - spoke_angle
+      //   }
+      //   console.log(spoke_angle)
+      // }
+
+      // console.log(spokes)
+      // sort spokes based on angle from reference
+      spokes.sort(function(a_, b_) {
+        a = a_[0]
+        b = b_[0]
+
+        var a_angle = v3d.sep_angle(ref, a)
+        var a_cross = v3d.crs(ref, a)
+        // console.log(a_angle)
+        if(v3d.dot(normal, a_cross) < 0) {
+          // console.log('CCW')
+          a_angle = 2*Math.PI - a_angle
+        }
+        // console.log(a_angle)
+
+        var b_angle = v3d.sep_angle(ref, b)
+        var b_cross = v3d.crs(ref, b)
+        // console.log(b_angle)
+        if(v3d.dot(normal, b_cross) < 0) {
+          // console.log('CCW')
+          b_angle = 2*Math.PI - b_angle
+        }
+        // console.log(b_angle)
+
+        return a_angle - b_angle
+      })
+      // console.log(spokes)
+
+      // for (spoke of spokes) {
+      //   let spoke_angle = v3d.sep_angle(ref, spoke[0])
+      //   let cross = v3d.crs(ref, spoke[0])
+      //   if(v3d.dot(normal, cross) < 0) {
+      //     spoke_angle = 2*Math.PI - spoke_angle
+      //   }
+      //   console.log(spoke_angle)
+      // }
+
+      // just extracting vertex from [spoke, vertex] pair
+      return spokes.map(function(spoke) {
+        return spoke[1]
+      })
+    }
+
     var dual = []
     function compute_VT_dual() {
       var circumcenters = []
       for (face of faces) {
-        circumcenters.push(circumcenter(face))
+        circumcenters.push(...project([circumcenter(face)], 1))
       }
       for(let i=0; i<vertices.length; i++) {
         dual.push([])
         for (neighbor of vertex_neighbors[i]) {
           dual[i].push(circumcenters[neighbor])
         }
+        console.log(dual[i])
+        dual[i] = order_vertices(dual[i])
+        console.log(dual[i])
+        console.log('======')
       }
       // console.log(dual)
       // return dual
@@ -145,7 +224,7 @@ function(p5,   v3d) {
         faces: faces
       },
       draw: draw,
-      draw_poly: draw_poly,
+      draw_dual: draw_dual,
       subdivide_and_project: subdivide_and_project,
       compute_VT_dual: compute_VT_dual
     }
