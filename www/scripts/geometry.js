@@ -2,32 +2,48 @@
 
 define(['p5', 'v3d'],
 function(p5,   v3d) {
+  // create an icosahedron, defined by a triangulated mesh, and having self
+  // modification functions such as subdivision and mesh dual computation
+  //
+  // the mesh is currently represented as an array of faces, with each face
+  // being an array of 3 vertex coordinates.
+  //
+  // something TODO eventually is change to half-edge or winged half-edge
   function icosahedron() {
-    var vertices = []
-    vertices.push([0, 0, 1])
-    var top_ring_init = [1, Math.PI/3, 0]
-    for (let i = 0; i < 5; i++) {
-      vertices.push(v3d.sph_to_crt(v3d.sph_rot_z(top_ring_init, i*2*Math.PI/5)))
-    }
-    var bot_ring_init = [1, 2*Math.PI/3, Math.PI/5]
-    for (let i = 0; i < 5; i++) {
-      vertices.push(v3d.sph_to_crt(v3d.sph_rot_z(bot_ring_init, i*2*Math.PI/5)))
-    }
-    vertices.push([0, 0, -1])
-    // console.log(vertices)
+    // initialize the vertices for a unit regular icosahedron centered at the origin
+    // function init(origin, radius) {
+      var vertices = []
+      vertices.push([0, 0, 1])
+      var top_ring_init = [1, Math.PI/3, 0]
+      for (let i = 0; i < 5; i++) {
+        vertices.push(v3d.sph_to_crt(v3d.sph_rot_z(top_ring_init, i*2*Math.PI/5)))
+      }
+      var bot_ring_init = [1, 2*Math.PI/3, Math.PI/5]
+      for (let i = 0; i < 5; i++) {
+        vertices.push(v3d.sph_to_crt(v3d.sph_rot_z(bot_ring_init, i*2*Math.PI/5)))
+      }
+      vertices.push([0, 0, -1])
+      // console.log(vertices)
+    // }
 
+    // little helper to keep track of neighboring vertices for each vertex. XXX
     var vertex_neighbors = []
     for (i=0;i<vertices.length;i++) {
       vertex_neighbors.push([])
     }
-    console.log(vertex_neighbors)
+    // console.log(vertex_neighbors)
 
+    // define faces for primitive, as triples of vertices
+    // NOTE: currently storing value, not reference
     var faces = []
     for (let i = 0; i < 5; i++) {
+      // define face 1
       faces.push([vertices[0], vertices[1+i], vertices[1+(i+1)%5]])
+      // add face 1 to neighbors list for each vertex associated with it
       vertex_neighbors[0].push(4*i)
       vertex_neighbors[1+i].push(4*i)
       vertex_neighbors[1+(i+1)%5].push(4*i)
+
       faces.push([vertices[1+i], vertices[6+i], vertices[1+(i+1)%5]])
       vertex_neighbors[1+i].push(4*i+1)
       vertex_neighbors[6+i].push(4*i+1)
@@ -40,18 +56,22 @@ function(p5,   v3d) {
       vertex_neighbors[6+i].push(4*i+3)
       vertex_neighbors[6+(i+1)%5].push(4*i+3)
       vertex_neighbors[11].push(4*i+3)
+      // doodle of storing vertex reference instead
       // faces.push([ 0,    1+i,        1+(i+1)%5 ])
       // faces.push([ 1+i,  6+i,        1+(i+1)%5 ])
       // faces.push([ 1+i,  6+(i+4)%5,  6+i       ])
       // faces.push([ 6+i,  6+(i+1)%5,  11        ])
     }
     // console.log(vertex_neighbors)
-    for (neighbor of vertex_neighbors) {
-      neighbor.sort(function(a,b) {
-        return a-b
-      })
-    }
+    // for (neighbor of vertex_neighbors) {
+    //   neighbor.sort(function(a,b) {
+    //     return a-b
+    //   })
+    // }
 
+    // draw 3D using p5 WEBGL mode (requires bind to sketch)
+    // assumes an array of faces, which are each a triple of order_vertices
+    // i.e. must be triangulated
     function draw() {
       this.beginShape(this.TRIANGLES)
       for (face of faces) {
@@ -62,14 +82,20 @@ function(p5,   v3d) {
       this.endShape()
     }
 
+    // TEMP draw mesh dual using p5 WEBGL mode (requires bind to sketch)
+    // just a temporary hack to visualize dual computation results
+    // eventually should have a single draw, or maybe have one for triangulated
+    // meshes and one for arbitrary planar()?) polygons?
+    // assumes an array of faces, which are aech an array of vertices
     function draw_dual() {
-      var i
-      var step = 255.0/4.0
+      // some fill gradient vars to help visualize
+      var i, step = 255.0/4.0
       for (face of dual) {
         i=0
-        // console.log(face)
+        // NOTE: WEBGL TRIANGLE_FAN draw mode relies on ordered/wound vertices
         this.beginShape(this.TRIANGLE_FAN)
         for(vertex of face) {
+          // fill gradient
           this.fill(i*step,i*step,100)
           i++
           this.vertex(...vertex)
@@ -78,13 +104,17 @@ function(p5,   v3d) {
       }
     }
 
+    // subdivide triangle faces by edge midpoint
     function subdivide(face) {
+      // get face vertices
       var v1 = face[0]
       var v2 = face[1]
       var v3 = face[2]
+      // compute midpoints
       var v1_v2_midpoint = v3d.scl(v3d.add(v1, v2), 0.5)
       var v2_v3_midpoint = v3d.scl(v3d.add(v2, v3), 0.5)
       var v3_v1_midpoint = v3d.scl(v3d.add(v3, v1), 0.5)
+      // define new faces
       var f1_ = [v1, v1_v2_midpoint, v3_v1_midpoint]
       var f2_ = [v2, v2_v3_midpoint, v1_v2_midpoint]
       var f3_ = [v3, v3_v1_midpoint, v2_v3_midpoint]
@@ -196,8 +226,9 @@ function(p5,   v3d) {
       })
     }
 
-    var dual = []
+    var dual
     function compute_VT_dual() {
+      dual = []
       var circumcenters = []
       for (face of faces) {
         circumcenters.push(...project([circumcenter(face)], 1))
@@ -207,13 +238,14 @@ function(p5,   v3d) {
         for (neighbor of vertex_neighbors[i]) {
           dual[i].push(circumcenters[neighbor])
         }
-        console.log(dual[i])
+        // console.log(dual[i])
         dual[i] = order_vertices(dual[i])
-        console.log(dual[i])
-        console.log('======')
+        // console.log(dual[i])
+        // console.log('======')
       }
       // console.log(dual)
       // return dual
+      vertices = dual
     }
 
     // console.log(circumcenter([[1,4,5],[3,1,4],[4,5,3]]))

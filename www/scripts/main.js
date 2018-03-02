@@ -34,19 +34,19 @@ function   (p5,   v3d,   geometry,   sketch_utils) {
       icosahedron.draw_dual = icosahedron.draw_dual.bind(sketch)
 
       sketch.setFrameRate(30)
-      // sketch.noLoop()
+      sketch.noLoop()
     }
 
     sketch.draw = function() {
       sketch.background(72)
       // sketch.orbitControl()
-      sketch.rotateZ(sketch.millis()/2000)
+      // sketch.rotateZ(sketch.millis()/2000)
       sketch.utils.drawAxes(1.5)
 
       // sketch.noStroke()
       sketch.stroke(255)
       sketch.noFill()
-      // icosahedron.draw()
+      icosahedron.draw()
       sketch.stroke(200,100,100)
       sketch.fill(72)
       icosahedron.draw_dual()
