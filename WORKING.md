@@ -1,9 +1,9 @@
 #### TO DOs?
-[ ] half-edge / winged half-edge mesh data structure
-[ ] mesh baking
-[ ] other primitives
-[ ] refactor
-[ ] compute dual
+- [ ] half-edge / winged half-edge mesh data structure
+- [ ] mesh baking
+- [ ] other primitives
+- [ ] refactor
+- [ ] compute dual
 
 #### WIP
 VT dual has issue after subdivision, pretty sure because of messy mesh data structure. Dual computation relies on __faces__, __vertices__, and __vertex_neighbors__ but ___subdivide()___ only changes faces
