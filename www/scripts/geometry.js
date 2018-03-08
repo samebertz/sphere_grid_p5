@@ -3,6 +3,14 @@ function(p5,   v3d) {
   // create an icosahedral triangulated mesh, in a winged edge data structure
   // http://www.dtic.mil/dtic/tr/fulltext/u2/755141.pdf
   //
+
+  function winged_edge() {
+    this._vertices = []
+    this._faces = []
+    this._edges = []
+    
+  }
+
   function icosahedron() {
     // initialize the vertices for a unit regular icosahedron centered at the origin
     var vertices = []
