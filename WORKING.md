@@ -6,4 +6,4 @@
 - [ ] compute dual
 
 ###### Winged-edge
-* moved over to [here](https://github.com/samebertz/data_structures/js/winged_edge) for now
+* moved over to [here](https://github.com/samebertz/data_structures/tree/master/js/winged_edge) for now
