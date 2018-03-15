@@ -6,7 +6,4 @@
 - [ ] compute dual
 
 ###### Winged-edge
-- [ ] vertex table
-- [ ] edge table
-- [ ] face table
-- [ ] traversal functions
+* moved over to [here](https://github.com/samebertz/data_structures/js/winged_edge) for now
